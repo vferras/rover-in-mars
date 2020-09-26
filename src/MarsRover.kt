@@ -12,65 +12,64 @@ fun main() {
 
     do {
         println("Insert command (f = forward, b = backward, l = turn left, r = turn right):")
-        val command = reader.next()
-        if (command == "f") {
-            if (roverPositionZ == "n") {
-                roverPositionY += 1
+
+        when(reader.next()) {
+            "f" -> {
+                val (newRoverPositionX, newRoverPositionY) = whenForward(roverPositionZ, roverPositionX, roverPositionY)
+                roverPositionX = newRoverPositionX
+                roverPositionY = newRoverPositionY
             }
-            if (roverPositionZ == "w") {
-                roverPositionX -= 1
+            "b" -> {
+                val (newRoverPositionX, newRoverPositionY) = whenBackward(roverPositionZ, roverPositionX, roverPositionY)
+                roverPositionX = newRoverPositionX
+                roverPositionY = newRoverPositionY
             }
-            if (roverPositionZ == "s") {
-                roverPositionY -= 1
-            }
-            if (roverPositionZ == "e") {
-                roverPositionX += 1
-            }
+            "l" -> roverPositionZ = whenLeft(roverPositionZ)
+            "r" -> roverPositionZ = whenRight(roverPositionZ)
         }
-        if (command == "b") {
-            if (roverPositionZ == "n") {
-                roverPositionY -= 1
-            }
-            if (roverPositionZ == "w") {
-                roverPositionX += 1
-            }
-            if (roverPositionZ == "s") {
-                roverPositionY += 1
-            }
-            if (roverPositionZ == "e") {
-                roverPositionX -= 1
-            }
-        }
-        if (command == "l") {
-            if (roverPositionZ == "n") {
-                roverPositionZ = "w"
-            }
-            if (roverPositionZ == "w") {
-                roverPositionZ = "s"
-            }
-            if (roverPositionZ == "s") {
-                roverPositionZ = "e"
-            }
-            if (roverPositionZ == "e") {
-                roverPositionZ = "n"
-            }
-        }
-        if (command == "r") {
-            if (roverPositionZ == "n") {
-                roverPositionZ = "e"
-            }
-            if (roverPositionZ == "e") {
-                roverPositionZ = "s"
-            }
-            if (roverPositionZ == "s") {
-                roverPositionZ = "w"
-            }
-            if (roverPositionZ == "w") {
-                roverPositionZ = "n"
-            }
-        }
+
         println(String.format("Rover is at x:%d y:%d facing:%s", roverPositionX, roverPositionY, roverPositionZ))
     } while (true)
+}
+
+private fun whenForward(currentPositionZ: String, currentPositionX: Int, currentPositionY: Int): Pair<Int, Int> {
+    return when(currentPositionZ) {
+        "n" -> Pair(currentPositionX, currentPositionY + 1)
+        "s" -> Pair(currentPositionX, currentPositionY - 1)
+        "e" -> Pair(currentPositionX + 1, currentPositionY)
+        "w" -> Pair(currentPositionX - 1, currentPositionY)
+        else -> Pair(0, 0)
+    }
+}
+
+private fun whenBackward(currentPositionZ: String, currentPositionX: Int, currentPositionY: Int): Pair<Int, Int> {
+    return when(currentPositionZ) {
+        "n" -> Pair(currentPositionX, currentPositionY - 1)
+        "s" -> Pair(currentPositionX, currentPositionY + 1)
+        "e" -> Pair(currentPositionX - 1, currentPositionY)
+        "w" -> Pair(currentPositionX + 1, currentPositionY)
+        else -> Pair(0, 0)
+    }
+}
+
+private fun whenLeft(currentPositionZ: String): String {
+    return when(currentPositionZ) {
+        "n" -> "w"
+        "s" -> "e"
+        "e" -> "n"
+        "w" -> "s"
+        else -> ""
+    }
+}
+
+private fun whenRight(currentPositionZ: String): String {
+    return when(currentPositionZ) {
+        "n" -> "e"
+        "s" -> "w"
+        "e" -> "s"
+        "w" -> "n"
+        else -> ""
+    }
 }
 
 private inline fun <reified T: Any> printAndRead(message: String, reader: Scanner): T {
