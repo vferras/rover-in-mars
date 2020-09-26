@@ -1,79 +1,84 @@
 import java.util.*
 
-object MarsRover {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        val reader = Scanner(System.`in`)
-        println("Insert horizontal map size:")
-        val sizex = reader.nextInt()
-        println("Insert vertical map size:")
-        val sizey = reader.nextInt()
-        println("Insert horizontal initial rover position:")
-        var roverx = reader.nextInt()
-        println("Insert vertical initial rover position:")
-        var rovery = reader.nextInt()
-        println("Insert initial rover direction:")
-        var roverz = reader.next() //n = north, e = east, w = west, s = south
-        do {
-            println("Insert command (f = forward, b = backward, l = turn left, r = turn right):")
-            val command = reader.next()
-            if (command == "f") {
-                if (roverz == "n") {
-                    rovery += 1
-                }
-                if (roverz == "w") {
-                    roverx -= 1
-                }
-                if (roverz == "s") {
-                    rovery -= 1
-                }
-                if (roverz == "e") {
-                    roverx += 1
-                }
+fun main() {
+    val reader = Scanner(System.`in`)
+
+    val initialHorizontalMapSize = printAndRead<Int>("Insert horizontal map size:", reader)
+    val initialVerticalMapSize = printAndRead<Int>("Insert vertical map size:", reader)
+
+    var roverPositionX = printAndRead<Int>("Insert horizontal initial rover position:", reader)
+    var roverPositionY = printAndRead<Int>("Insert vertical initial rover position:", reader)
+    var roverPositionZ = printAndRead<String>("Insert initial rover direction:", reader)
+
+    do {
+        println("Insert command (f = forward, b = backward, l = turn left, r = turn right):")
+        val command = reader.next()
+        if (command == "f") {
+            if (roverPositionZ == "n") {
+                roverPositionY += 1
             }
-            if (command == "b") {
-                if (roverz == "n") {
-                    rovery -= 1
-                }
-                if (roverz == "w") {
-                    roverx += 1
-                }
-                if (roverz == "s") {
-                    rovery += 1
-                }
-                if (roverz == "e") {
-                    roverx -= 1
-                }
+            if (roverPositionZ == "w") {
+                roverPositionX -= 1
             }
-            if (command == "l") {
-                if (roverz == "n") {
-                    roverz = "w"
-                }
-                if (roverz == "w") {
-                    roverz = "s"
-                }
-                if (roverz == "s") {
-                    roverz = "e"
-                }
-                if (roverz == "e") {
-                    roverz = "n"
-                }
+            if (roverPositionZ == "s") {
+                roverPositionY -= 1
             }
-            if (command == "r") {
-                if (roverz == "n") {
-                    roverz = "e"
-                }
-                if (roverz == "e") {
-                    roverz = "s"
-                }
-                if (roverz == "s") {
-                    roverz = "w"
-                }
-                if (roverz == "w") {
-                    roverz = "n"
-                }
+            if (roverPositionZ == "e") {
+                roverPositionX += 1
             }
-            println(String.format("Rover is at x:%d y:%d facing:%s", roverx, rovery, roverz))
-        } while (true)
+        }
+        if (command == "b") {
+            if (roverPositionZ == "n") {
+                roverPositionY -= 1
+            }
+            if (roverPositionZ == "w") {
+                roverPositionX += 1
+            }
+            if (roverPositionZ == "s") {
+                roverPositionY += 1
+            }
+            if (roverPositionZ == "e") {
+                roverPositionX -= 1
+            }
+        }
+        if (command == "l") {
+            if (roverPositionZ == "n") {
+                roverPositionZ = "w"
+            }
+            if (roverPositionZ == "w") {
+                roverPositionZ = "s"
+            }
+            if (roverPositionZ == "s") {
+                roverPositionZ = "e"
+            }
+            if (roverPositionZ == "e") {
+                roverPositionZ = "n"
+            }
+        }
+        if (command == "r") {
+            if (roverPositionZ == "n") {
+                roverPositionZ = "e"
+            }
+            if (roverPositionZ == "e") {
+                roverPositionZ = "s"
+            }
+            if (roverPositionZ == "s") {
+                roverPositionZ = "w"
+            }
+            if (roverPositionZ == "w") {
+                roverPositionZ = "n"
+            }
+        }
+        println(String.format("Rover is at x:%d y:%d facing:%s", roverPositionX, roverPositionY, roverPositionZ))
+    } while (true)
+}
+
+private inline fun <reified T: Any> printAndRead(message: String, reader: Scanner): T {
+    println(message)
+
+    return when(T::class) {
+        Int::class -> reader.nextInt() as T
+        String::class -> reader.next() as T
+        else -> reader.next() as T
     }
 }
