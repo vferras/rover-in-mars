@@ -1,93 +1,119 @@
 import java.util.*
+import java.util.regex.Pattern
+
+object Memory { val reader = Scanner(System.`in`) }
 
 fun main() {
-    val reader = Scanner(System.`in`)
-
-    val points = mapOf(
-            "mapSizeX" to printAndRead<Int>("Insert horizontal map size:", reader),
-            "mapSizeY" to printAndRead<Int>("Insert vertical map size:", reader),
-            "x" to printAndRead<Int>("Insert horizontal initial rover position:", reader),
-            "y" to printAndRead<Int>("Insert vertical initial rover position:", reader),
-            "z" to printAndRead<String>("Insert initial rover direction:", reader)
-    )
-
-    readInputAndMove(reader, points)
+    readInputAndMove {
+        mutableMapOf(
+                "mapSizeX" to printAndReadInput<Int>("Insert horizontal map size:"),
+                "mapSizeY" to printAndReadInput<Int>("Insert vertical map size:"),
+                "x" to printAndReadInput<Int>("Insert horizontal initial rover position:"),
+                "y" to printAndReadInput<Int>("Insert vertical initial rover position:"),
+                "z" to printAndReadInput<String>("Insert initial rover direction:")
+        )
+    }
 }
 
-fun readInputAndMove(reader: Scanner, points: Map<String, Any>) {
-    tailrec fun recursive(reader: Scanner, points: Map<String, Any>) {
-        println("Insert command (f = forward, b = backward, l = turn left, r = turn right):")
+fun readInputAndMove(points: () -> MutableMap<String, Any>) {
+    tailrec fun recursiveReadInputAndMove(points: MutableMap<String, Any>) {
+        printMovementInfo(points["x"] as Int, points["y"] as Int, points["z"] as String)
 
-        val result = when(reader.next()) {
-            "f" -> {
-                val (newPositionX, newPositionY) = whenForward(points)
-                mapOf("z" to points["z"].toString(), "x" to newPositionX, "y" to newPositionY)
-            }
-            "b" -> {
-                val (newPositionX, newPositionY) = whenBackward(points)
-                mapOf("z" to points["z"].toString(), "x" to newPositionX, "y" to newPositionY)
-            }
-            "l" -> mapOf("z" to whenLeft(points), "x" to points["x"] as Int, "y" to points["y"] as Int)
-            "r" -> mapOf("z" to whenRight(points), "x" to points["x"] as Int, "y" to points["y"] as Int)
-            else -> {
-                println("Incorrect direction. Try again.")
-                points
-            }
+        when(Memory.reader.next()) {
+            "f" -> moveForward(points)
+            "b" -> moveBackward(points)
+            "l" -> turnLeft(points)
+            "r" -> turnRight(points)
+            else -> println("Incorrect direction. Try again.")
         }
-
-        println(String.format("Rover is at x:%d y:%d facing:%s", result["x"], result["y"], result["z"]))
-        recursive(reader = reader, result)
+        recursiveReadInputAndMove(checkEdge(points))
     }
 
-    return recursive(reader, points)
+    return recursiveReadInputAndMove(points())
 }
 
-fun whenForward(points: Map<String, Any>): Pair<Int, Int> {
-    return when(points["z"]) {
-        "n" -> Pair(points["x"] as Int, points["y"] as Int + 1)
-        "s" -> Pair(points["x"] as Int, points["y"] as Int - 1)
-        "e" -> Pair(points["x"] as Int + 1, points["y"] as Int)
-        "w" -> Pair(points["x"] as Int - 1, points["y"] as Int)
-        else -> Pair(points["x"] as Int, points["y"] as Int)
+fun moveForward(points: MutableMap<String, Any>): Map<String, Any> {
+    when(points["z"]) {
+        "n" -> points["y"] = points["y"] as Int + 1
+        "s" -> points["y"] = points["y"] as Int - 1
+        "e" -> points["x"] = points["x"] as Int + 1
+        "w" -> points["x"] = points["x"] as Int - 1
     }
+    return points
 }
 
-fun whenBackward(points: Map<String, Any>): Pair<Int, Int> {
-    return when(points["z"]) {
-        "n" -> Pair(points["x"] as Int, points["y"] as Int - 1)
-        "s" -> Pair(points["x"] as Int, points["y"] as Int + 1)
-        "e" -> Pair(points["x"] as Int - 1, points["y"] as Int)
-        "w" -> Pair(points["x"] as Int + 1, points["y"] as Int)
-        else -> Pair(points["x"] as Int, points["y"] as Int)
+fun moveBackward(points: MutableMap<String, Any>): Map<String, Any> {
+    when(points["z"]) {
+        "n" -> points["y"] = points["y"] as Int - 1
+        "s" -> points["y"] = points["y"] as Int + 1
+        "e" -> points["x"] = points["x"] as Int - 1
+        "w" -> points["x"] = points["x"] as Int + 1
     }
+    return points
 }
 
-fun whenLeft(points: Map<String, Any>): String {
-    return when(points["z"]) {
-        "n" -> "w"
-        "s" -> "e"
-        "e" -> "n"
-        "w" -> "s"
-        else -> points["z"].toString()
+fun turnLeft(points: MutableMap<String, Any>): Map<String, Any> {
+    when(points["z"]) {
+        "n" -> points["z"] = "w"
+        "s" -> points["z"] = "e"
+        "e" -> points["z"] = "n"
+        "w" -> points["z"] = "s"
     }
+    return points
 }
 
-fun whenRight(points: Map<String, Any>): String {
-    return when(points["z"]) {
-        "n" -> "e"
-        "s" -> "w"
-        "e" -> "s"
-        "w" -> "n"
-        else -> points["z"].toString()
+fun turnRight(points: MutableMap<String, Any>): Map<String, Any> {
+    when(points["z"]) {
+        "n" -> points["z"] = "e"
+        "s" -> points["z"] = "w"
+        "e" -> points["z"] = "s"
+        "w" -> points["z"] = "n"
     }
+    return points
 }
 
-private inline fun <reified T: Any> printAndRead(message: String, reader: Scanner): T {
+fun checkEdge(points: MutableMap<String, Any>): MutableMap<String, Any> {
+    fun replacePointIntoMap(map: MutableMap<String, Any>, point: Pair<String, Any>): MutableMap<String, Any> {
+        when(point.first) {
+            "x" -> map["x"] = point.second
+            "y" -> map["y"] = point.second
+        }
+        return map
+    }
+
+    if(points["y"] as Int > points["mapSizeY"] as Int) replacePointIntoMap(points, Pair("y", 1))
+    if(points["y"] as Int <= 0) replacePointIntoMap(points, Pair("y", points["mapSizeY"] as Int))
+    if(points["x"] as Int > points["mapSizeX"] as Int) replacePointIntoMap(points, Pair("x", 1))
+    if(points["x"] as Int <= 0) replacePointIntoMap(points, Pair("x", points["mapSizeX"] as Int))
+
+    return points
+}
+
+inline fun <reified T: Any> printAndReadInput(message: String): T {
     println(message)
 
     return when(T::class) {
-        Int::class -> reader.nextInt() as T
-        String::class -> reader.next() as T
-        else -> reader.next() as T
+        Int::class -> {
+            try { Memory.reader.nextInt() as T }
+            catch (e: InputMismatchException) {
+                Memory.reader.next()
+                println("Incorrect value. Defaulted to 1")
+                1 as T
+            }
+        }
+        String::class -> {
+            if(Memory.reader.hasNext(Pattern.compile("[nsew]"))) Memory.reader.next() as T
+            else {
+                Memory.reader.next()
+                println("Incorrect value. Defaulted to n")
+                "n" as T
+            }
+        }
+        else -> Memory.reader.next() as T
     }
+}
+
+private val printMovementInfo = { x: Int, y: Int, z: String ->
+    println("Rover is at x:$x y:$y facing:$z")
+    println("Insert command (f = forward, b = backward, l = turn left, r = turn right):")
 }
