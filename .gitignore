@@ -103,3 +103,8 @@ hs_err_pid*
 
 # End of https://www.gitignore.io/api/java,scala,kotlin,eclipse,clojure,intellij
 /wallapop-backend-test.iml
+
+.gradle/
+build/
+gradle/
+gradlew

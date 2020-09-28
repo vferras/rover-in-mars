@@ -1,10 +1,8 @@
-import org.junit.jupiter.api.MethodOrderer
+package com.vferras
+
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestMethodOrder
-import kotlin.test.assertTrue
 
-
-@TestMethodOrder(MethodOrderer.Alphanumeric::class)
 class MarsRoverTest {
     @Test
     fun `given a position when moving forward then a new position is set`() {
