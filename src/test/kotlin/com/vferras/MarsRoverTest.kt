@@ -96,7 +96,30 @@ class MarsRoverTest {
         )
 
         listOf(positionAndResult1, positionAndResult2, positionAndResult3, positionAndResult4).forEach {
-            assertTrue { checkEdge(it.first) == it.second }
+            assertTrue { it.first.checkEdge() == it.second }
+        }
+    }
+
+    @Test
+    fun `given an obstacle when trying to move to it then the rover detects it`(){
+        val position = mutableMapOf<String, Any>("x" to 1, "y" to 5, "obstacles" to "1:5")
+
+        assertTrue { position.ifAnyObstacle() }
+    }
+
+    @Test
+    fun `given an obstacle when trying to move to it then the rover stops`() {
+        val positionAndResult1 = Pair(
+            mutableMapOf<String, Any>("x" to 1, "y" to 5, "z" to "n", "obstacles" to "1:5", "lastMovement" to "f"),
+            mutableMapOf<String, Any>("x" to 1, "y" to 4, "z" to "n", "obstacles" to "1:5", "lastMovement" to "f")
+        )
+        val positionAndResult2 = Pair(
+            mutableMapOf<String, Any>("x" to 1, "y" to 5, "z" to "n", "obstacles" to "1:5", "lastMovement" to "b"),
+            mutableMapOf<String, Any>("x" to 1, "y" to 6, "z" to "n", "obstacles" to "1:5", "lastMovement" to "b")
+        )
+
+        listOf(positionAndResult1, positionAndResult2).forEach {
+            assertTrue { true.thenRollbackMovement(it.first) == it.second }
         }
     }
 }
