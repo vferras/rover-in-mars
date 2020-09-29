@@ -3,6 +3,6 @@ VOLUME /tmp
 RUN mkdir /app
 COPY . /app
 WORKDIR /app
-RUN /app/gradlew build
-RUN mv /app/build/libs/*.jar /app/
+RUN /app/gradlew clean build
+RUN mv /app/build/libs/*.jar /app/wallapop-backend-test.jar
 ENTRYPOINT ["java", "-jar", "/app/wallapop-backend-test.jar"]
