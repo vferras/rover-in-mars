@@ -4,5 +4,5 @@ RUN mkdir /app
 COPY . /app
 WORKDIR /app
 RUN /app/gradlew clean build
-RUN mv /app/build/libs/*.jar /app/wallapop-backend-test.jar
-ENTRYPOINT ["java", "-jar", "/app/wallapop-backend-test.jar"]
+RUN mv /app/build/libs/*.jar /app/rover-in-mars.jar
+ENTRYPOINT ["java", "-jar", "/app/rover-in-mars.jar"]
